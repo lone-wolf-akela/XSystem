@@ -1156,7 +1156,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--ºÏ≤‚µ•ŒªÃÿ÷ ¥•∑¢Ãıº˛£
 							--			end
 							--		end
 							--	end
-							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCommandCode")then
+							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCode")then
 								Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10](iGroup, iPlayer, iShip)
 							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "DroneShip")then
 								local iDroneMotherShipName = iGroup..iShip.."_"..iAbility.."_Drone_"
@@ -1306,6 +1306,14 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--ºÏ≤‚µ•ŒªÃÿ÷ ¥•∑¢Ãıº˛£
 										else
 											SobGroup_TakeDamage(iGroup, 1)
 										end
+									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==31)then--◊‘∂®“Â√¸¡Ó
+										if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
+											local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+											if(iFlag==1)then
+												SobGroup_CustomCommand(iCommandGroup)
+											end
+										end
+									end
 									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==32)then--…Ò∑Á√¸¡Ó
 										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
 										if(iFlag==1)then
@@ -1425,7 +1433,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--ºÏ≤‚µ•ŒªÃÿ÷ ¥•∑¢Ãıº˛£
 								AllUnitsStates[iShip][iAbilityLocalNumber + 1] = 4
 							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CycExplode")then
 								AllUnitsStates[iShip][iAbilityLocalNumber + 1] = 4
-							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCommandCode")then
+							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCode")then
 								Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11](iGroup, iPlayer, iShip)
 							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "DroneShip")then
 								local iDroneMotherShipName = iGroup..iShip.."_"..iAbility.."_Drone_"
@@ -1903,7 +1911,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--ºÏ≤‚µ•ŒªÃÿ÷ ¥•∑¢Ãıº˛£
 										SobGroup_AbilityActivate(iGroup, AB_Table[Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]], 1)
 									end
 								end
-							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCommandCode")then
+							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCode")then
 								Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12](iGroup, iPlayer, iShip)
 							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "DroneShip")then
 								local iDroneMotherShipName = iGroup..iShip.."_"..iAbility.."_Drone_"
