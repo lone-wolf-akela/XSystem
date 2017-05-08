@@ -1,15 +1,11 @@
---version 2.1.0.2017.03.04
+--version 2.1.2.2017.05.07
 
 --dofilepath("data:leveldata/multiplayer/resdata/reslist.lua")
 dofilepath("data:leveldata/multiplayer/resdata/XTechConditionJudge.lua")
 dofilepath("data:leveldata/multiplayer/resdata/XTechFunction.lua")
-PlayerSurviveJudge = 0
-ShipForSurvive = {}
-Technologies = {}
 TechnologyControlState = {}
 TechnologyTimeCountDown = {}
 TechnologyControlStateAnnal = {}
-dofilepath("data:leveldata/multiplayer/resdata/reslist2.lua")
 
 SG_Characteristic = 
 {
@@ -143,15 +139,16 @@ function TechnologyControlInitlize()
 end
 
 function TechnologyControl()
-	---2:可见
-	---1:受控中
-	--0:未出现
-	--1:可研究但受控
-	--2:可研究不受控
-	--3:研究中但受控
-	--4:研究中不受控
-	--5:研究完成
-	--6:激活中
+	---2:已满足研究列表解锁条件，将始终可见(Lock=-1)
+	---1:已满足研究列表解锁条件，但被X系统禁止研究(Lock=0 or 1)
+	--0:未在研究列表中解锁，尚未受X系统控制
+	--1: 已满足研究列表和X系统解锁条件，但仍受X系统控制(Lock=0 or -1)
+	--2: 已满足研究列表和X系统解锁条件，将始终可见(Lock=1)
+	--3: 正在研究，且仍受X系统控制(Lock=0 or -1)
+	--4: 正在研究，且不受X系统控制(Lock=1)
+	--5:已研究完成
+	--6:激活中(AutoReset/FunctionReset)
+	--7:冷却中(AutoReset/FunctionReset)
 	local iPlayerIndex = 0
 	local iPlayerCount = Universe_PlayerCount()
 	while(iPlayerIndex < iPlayerCount)do
@@ -169,7 +166,10 @@ function TechnologyControl()
 						end
 					end
 					
-					if(TechnologyControlState[iPlayerIndex + 1][iTechnology] == 1 or TechnologyControlState[iPlayerIndex + 1][iTechnology] == -1 or TechnologyControlState[iPlayerIndex + 1][iTechnology] == -2 or TechnologyControlState[iPlayerIndex + 1][iTechnology] == 3)then
+					if(TechnologyControlState[iPlayerIndex + 1][iTechnology] == 1 
+					or TechnologyControlState[iPlayerIndex + 1][iTechnology] == -1 
+					or TechnologyControlState[iPlayerIndex + 1][iTechnology] == -2 
+					or TechnologyControlState[iPlayerIndex + 1][iTechnology] == 3)then
 						local iLegal = 0
 						local iConditionGroup = 1
 						while(iLegal == 0 and Technologies[iTechnology].Opener[iConditionGroup] ~= nil)do
@@ -235,7 +235,7 @@ function TechnologyControl()
 								XDoTechFunction(iPlayerIndex,Technologies[iTechnology].Function,iTechnology)
 							end
 						elseif(Technologies[iTechnology].Type=="AutoReset")then
-							if(TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology]<(Technologies[iTechnology].ColdTime-Technologies[iTechnology].Length)*10)then
+							if(TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology]<Technologies[iTechnology].Length*10)then
 								TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology]=TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology]+1
 								XDoTechFunction(iPlayerIndex,Technologies[iTechnology].Function,iTechnology)
 							else
@@ -247,7 +247,7 @@ function TechnologyControl()
 										
 					if(TechnologyControlState[iPlayerIndex + 1][iTechnology] == 7)then--7:冷却中
 						TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology]=TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology]+1
-						if(TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology]==Technologies[iTechnology].ColdTime*10)then
+						if(TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology]==(Technologies[iTechnology].Length+Technologies[iTechnology].ColdTime)*10)then
 							TechnologyControlState[iPlayerIndex + 1][iTechnology] = 1--1:可研究但受控
 							TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology] = 0
 							Player_UnrestrictResearchOption(iPlayerIndex, Technologies[iTechnology].Name)

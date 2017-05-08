@@ -286,11 +286,11 @@ end
 X_ConditionJudge["HealthPercentage"]=function(iPlayer, iShip, iGroup, iCondition)
 	local iReturn = 0
 	if(iCondition[2]>0)then
-		if(SobGroup_HealthPercentage(iGroup) >= iCondition[2])then
+		if(100*SobGroup_HealthPercentage(iGroup) >= iCondition[2])then
 			iReturn = 1
 		end
 	else
-		if(SobGroup_HealthPercentage(iGroup) <= -iCondition[2])then
+		if(100*SobGroup_HealthPercentage(iGroup) <= -iCondition[2])then
 			iReturn = 1
 		end
 	end
@@ -300,7 +300,7 @@ end
 --单位燃料值判断:{"FuelPercentage",<FuelPercentage>,}
 X_ConditionJudge["FuelPercentage"]=function(iPlayer, iShip, iGroup, iCondition)
 	local iReturn = 0
-	local iFuelPercent = AllUnitsStates[iShip][24][1] / AllUnitsStates[iShip][24][2]
+	local iFuelPercent = 100 * AllUnitsStates[iShip][24][1] / AllUnitsStates[iShip][24][2]
 	if(iCondition[2]>0)then
 		if(iFuelPercent >= iCondition[2])then
 			iReturn = 1
@@ -323,11 +323,11 @@ X_ConditionJudge["ShieldPercentage"]=function(iPlayer, iShip, iGroup, iCondition
 		iCheckPercent2 = AllUnitsStates[iShip][11][2] / AllUnitsStates[iShip][14]
 	end
 	if(iCondition[2]>0)then
-		if(iCheckPercent1/iCheckPercent2 >= iCondition[2])then
+		if(100*iCheckPercent1/iCheckPercent2 >= iCondition[2])then
 			iReturn = 1
 		end
 	else
-		if(iCheckPercent1/iCheckPercent2 <= -iCondition[2])then
+		if(100*iCheckPercent1/iCheckPercent2 <= -iCondition[2])then
 			iReturn = 1
 		end
 	end
@@ -344,11 +344,11 @@ X_ConditionJudge["ArmorPercentage"]=function(iPlayer, iShip, iGroup, iCondition)
 		iCheckPercent2 = AllUnitsStates[iShip][13][2] / AllUnitsStates[iShip][14]
 	end
 	if(iCondition[2]>0)then
-		if(iCheckPercent1/iCheckPercent2 >= iCondition[2])then
+		if(100*iCheckPercent1/iCheckPercent2 >= iCondition[2])then
 			iReturn = 1
 		end
 	else
-		if(iCheckPercent1/iCheckPercent2 <= -iCondition[2])then
+		if(100*iCheckPercent1/iCheckPercent2 <= -iCondition[2])then
 			iReturn = 1
 		end
 	end
@@ -491,6 +491,24 @@ X_ConditionJudge["IsInsideDustCloud"]=function(iPlayer, iShip, iGroup, iConditio
 		if(SobGroup_AreAnySquadronsInsideDustCloud(iGroup, NebulaCloudList[-iCondition[2]])~=0)then
 			iReturn = 1
 		end
+	end
+	return iReturn
+end
+
+--单位使用能力判断:{"IsDoingAbility",<AbilityID>,}
+X_ConditionJudge["IsDoingAbility"]=function(iPlayer, iShip, iGroup, iCondition)
+	local iReturn = SobGroup_IsDoingAbility(iGroup, AB_Table[iCondition[2]])
+	if (iCondition[2]<0) then
+		iReturn = 1-iReturn
+	end
+	return iReturn
+end
+
+--单位能力激活判断:{"CanDoAbility",<AbilityID>,}
+X_ConditionJudge["IsDoingAbility"]=function(iPlayer, iShip, iGroup, iCondition)
+	local iReturn = SobGroup_CanDoAbility(iGroup, AB_Table[iCondition[2]])
+	if (iCondition[2]<0) then
+		iReturn = 1-iReturn
 	end
 	return iReturn
 end

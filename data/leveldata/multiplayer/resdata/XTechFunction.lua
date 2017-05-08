@@ -1,12 +1,18 @@
-function XDoTechFunction(iPlayerIndex,iFunction,iTechnology)
-	for Index,Parameter in iFunction do
-		XTechFunction[Index](iPlayerIndex,Parameter,TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology],iTechnology)
-	end
-end
+--Function=
+--{
+--		……
+--		{<FunctionName>,<FunctionParameter>,},
+--		……
+--}
 
 XTechFunction = {}
-XTechFunction["GainRU"]=function(iPlayer,Parameter,iTime,iTechnology)--玩家序号，Function参数，时间，科技序号
-	if(iTime==10)then
+--FunctionName: "GainRU"
+--Give player <FunctionParameter> RU when the technology is researched
+XTechFunction["GainRU"]=function(iPlayer,Parameter,iTime,iTechnology)--PlayerIndex，FunctionParameter，Time，TechnologyIndex
 	Player_SetRU(iPlayer,Player_GetRU(iPlayer)+Parameter)
-	end
+end
+
+--叫停FunctionReset类科技
+function XEndTech(iPlayerIndex,iTechnology)
+	TechnologyTimeCountDown[iPlayerIndex + 1][iTechnology]=-1
 end

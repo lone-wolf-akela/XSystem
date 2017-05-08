@@ -33,12 +33,15 @@ AB_Table =
 	AB_DefenseFieldShield,
 	AB_HyperspaceInhibitor,
 	AB_Salvage,
+	AB_Scuttle,
+	AB_UseSpecialWeaponsInNormalAttack,
 	AB_Steering,
 	AB_Targeting,
 	AB_Sensors,
-	AB_Scuttle,
-	AB_UseSpecialWeaponsInNormalAttack,
+	AB_Lights,
+	AB_SalCap,
 	AB_Custom,
+	AB_Kamikaze,
 }
 
 
@@ -1294,7 +1297,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--ºÏ≤‚µ•ŒªÃÿ÷ ¥•∑¢Ãıº˛£
 										if(iFlag==1)then
 											SobGroup_SalvageSobGroup(iCommandGroup, iTargetGroup)
 										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==27)then--◊‘ªŸ√¸¡Ó
+									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==24)then--◊‘ªŸ√¸¡Ó
 										if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
 											local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
 											if(iFlag==1)then
@@ -1303,7 +1306,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--ºÏ≤‚µ•ŒªÃÿ÷ ¥•∑¢Ãıº˛£
 										else
 											SobGroup_TakeDamage(iGroup, 1)
 										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==29)then--…Ò∑Á√¸¡Ó
+									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==32)then--…Ò∑Á√¸¡Ó
 										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
 										if(iFlag==1)then
 											SobGroup_Kamikaze(iCommandGroup, iTargetGroup)
