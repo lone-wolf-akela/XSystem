@@ -1013,313 +1013,260 @@ function UnitDeath(iShip, iGroup)
 end
 
 function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--检测单位特质触发条件，参数为：单位组及名称，玩家ID，单位ID
-	--local iShip = SkillRuningMemory
-	--local iPressure = 0
 	local iPlayerRUGet = {0,0,0,0,0,0,0,0,}
-	--while(iPressure < RuningPressureKey)do
-		--if(AllUnitsStates[iShip] == nil)then--change
-			--SkillRuningMemory = 1
-			--iPressure = RuningPressureKey
-			
-			--local iPlayer = 0
-			--local iPlayerCount = Universe_PlayerCount()
-			--while(iPlayer < iPlayerCount)do
-			--	local iResourceObj = 1
-			--	while(CustomResourceList[iResourceObj] ~= nil)do
-			--		if(PlayerResourceColligateList[iPlayer + 1][iResourceObj][6] == 0)then
-			--			PlayerResourceColligateList[iPlayer + 1][iResourceObj][6] = 1
-			--		end
-			--		iResourceObj = iResourceObj + 1
-			--	end
-			--	iPlayer = iPlayer + 1
-			--end
-		--else
-			--local iPlayer = iPlayer
-			--if(SobGroup_Empty(iGroup) == 1)then--单位死亡
-			--	AllUnitsStates[iShip][4] = Universe_GameTime()
-			--else
-				if(AllUnitsStates[iShip][16] ~= 0)then
-					--iPressure = iPressure + 1
-					local iHealth = SobGroup_HealthPercentage(iGroup)
-					local iActualSpeed = sqrt(SobGroup_GetActualSpeed(iGroup))
-					local iHealthHold = iHealth
-					local iDamageValue = AllUnitsStates[iShip][5] - iHealth
-					local iScuttle = 0
-					if(iDamageValue < 0)then
-						iDamageValue = 0
-						AllUnitsStates[iShip][5] = iHealth
+	if(AllUnitsStates[iShip][16] ~= 0)then
+		local iHealth = SobGroup_HealthPercentage(iGroup)
+		local iActualSpeed = sqrt(SobGroup_GetActualSpeed(iGroup))
+		local iHealthHold = iHealth
+		local iDamageValue = AllUnitsStates[iShip][5] - iHealth
+		local iScuttle = 0
+		if(iDamageValue < 0)then
+			iDamageValue = 0
+			AllUnitsStates[iShip][5] = iHealth
+		end
+		local iDamage = 1
+		local iDamageMu = 1
+					
+		local iSubDamage = 1
+		local iSubDamageMu = 1
+					
+		local iFuelValue = 0
+		local iFuelCap = 0
+
+		local iShieldValue = 0
+		local iShieldCap = 0
+
+		local iArmorValue = 0
+		local iArmorCap = 0
+		local iArmorAbsorb = 0
+					
+		local iExperience = 0
+		local iExperienceCap = 0
+					
+		local iStructure = 0
+					
+		local iRepair = 0
+		local iRepairMu = 0
+					
+		local iSpeed = 1
+		local iSpeedMu = 1
+					
+		local iBuildingSpeed = 1
+		local iBuildingSpeedMu = 1
+		local iBuildingSpeedKey = 0
+					
+		local iRUAddValue = 0
+					
+		local bSubsystemDefend = 0
+		local igSubsystemDefend = 
+		{
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+			{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
+		}
+		local iAbility = 1
+		while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility] ~= nil)do
+			local iAbilityLocalNumber = SHIPGLOBALSTATEOBLIGATENUMBER -  9 + 10 * iAbility
+			local iSkillPressureID = 1
+			---------------------一阶段前的额外检测
+			if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "ShipIdioStateKeyTempOn")then
+				if(AllUnitsStates[iShip][iAbilityLocalNumber + 3]==0)then
+					if(AllUnitsStates[iShip][iAbilityLocalNumber + 1]==1 or AllUnitsStates[iShip][iAbilityLocalNumber + 1]==2 or AllUnitsStates[iShip][iAbilityLocalNumber + 1]==3)then
+							AllUnitsStates[iShip][iAbilityLocalNumber + 3] = Universe_GameTime() + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11]
+							xSetShipIdioStateKey(iShip,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10],"On")
 					end
-					local iDamage = 1
-					local iDamageMu = 1
-					
-					local iSubDamage = 1
-					local iSubDamageMu = 1
-					
-					local iFuelValue = 0
-					local iFuelCap = 0
+				elseif(AllUnitsStates[iShip][iAbilityLocalNumber + 3]>0)then
+					if(AllUnitsStates[iShip][iAbilityLocalNumber + 3] <= Universe_GameTime())then
+						xSetShipIdioStateKey(iShip,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10],"Off")
+						AllUnitsStates[iShip][iAbilityLocalNumber + 3] = - Universe_GameTime() - Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12]
+					end
+				elseif(-AllUnitsStates[iShip][iAbilityLocalNumber + 3] <= Universe_GameTime())then
+					AllUnitsStates[iShip][iAbilityLocalNumber + 3] = 0
+				end
+			end
 
-					local iShieldValue = 0
-					local iShieldCap = 0
+			if(AllUnitsStates[iShip][iAbilityLocalNumber + 1] == 1)then---------------------一阶段动作
+				AllUnitsStates[iShip][iAbilityLocalNumber + 1] = 2
+				local iAnim = 1 --播放所有动画
+				while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][1][iAnim] ~= nil)do
+					SobGroup_SetMadState(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][1][iAnim])
+					iAnim = iAnim + 1
+				end
+				local iEvent = 1 --播放所有蘙效
+				while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][2][iEvent] ~= nil)do
+					FX_StartEvent(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][2][iEvent])
+					iEvent = iEvent + 1
+				end
+				AllUnitsStates[iShip][iAbilityLocalNumber + 2] = Universe_GameTime() + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][3]
+							
+				--技能执行
+				if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfChangePower")then
+					local iPower = 1
+					while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11][iPower] ~= nil)do
+						SobGroup_ChangePower(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11][iPower], 0)
+						iPower = iPower + 1
+					end
+				elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCode")then
+					Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10](iGroup, iPlayer, iShip)
+				elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "DroneShip")then
+					local iDroneMotherShipName = iGroup..iShip.."_"..iAbility.."_Drone_"
+					local iDrone = 1
+					while(iDrone <= Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11])do
+						SobGroup_Create(iDroneMotherShipName..iDrone)
+						SobGroup_SetSwitchOwnerFlag(iDroneMotherShipName..iDrone, 0)
+						iDrone = iDrone + 1
+					end
+					AllUnitsStates[iShip][iAbilityLocalNumber + 4] = iDrone
+				elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "RestrictShipBuildingOption")then
+					local iBuildOption = 1
+					while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][iBuildOption] ~= nil)do
+						SobGroup_RestrictBuildOption(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][iBuildOption])
+						iBuildOption = iBuildOption + 1
+					end
+				end
+			end
 
-					local iArmorValue = 0
-					local iArmorCap = 0
-					local iArmorAbsorb = 0
+			if(AllUnitsStates[iShip][iAbilityLocalNumber + 1] == 2)then---------------------一阶段完成
+				if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][4] == 1)then
+					iSpeedMu = 0
+				end
+				--技能执行
+				if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfIdioFuel")then
+					iFuelCap = iFuelCap + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]
+				elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfIdioShield")then
+					iShieldCap = iShieldCap + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]
+				elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfIdioArmor")then
+					iArmorCap = iArmorCap + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]
+				end
+							
+				if(Universe_GameTime() >= AllUnitsStates[iShip][iAbilityLocalNumber + 2])then
+					AllUnitsStates[iShip][iAbilityLocalNumber + 1] = 3
+					AllUnitsStates[iShip][iAbilityLocalNumber + 9] = Universe_GameTime()
 					
-					local iExperience = 0
-					local iExperienceCap = 0
-					
-					local iStructure = 0
-					
-					local iRepair = 0
-					local iRepairMu = 0
-					
-					local iSpeed = 1
-					local iSpeedMu = 1
-					
-					local iBuildingSpeed = 1
-					local iBuildingSpeedMu = 1
-					local iBuildingSpeedKey = 0
-					
-					local iRUAddValue = 0
-					
-					local bSubsystemDefend = 0
-					local igSubsystemDefend = 
-					{
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-						{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},{"",0,1,0,0},
-					}
-					local iAbility = 1
-					while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility] ~= nil)do
-						local iAbilityLocalNumber = SHIPGLOBALSTATEOBLIGATENUMBER -  9 + 10 * iAbility
-						--iPressure = iPressure + 1
-						local iSkillPressureID = 1
-						--while(SkillPressure[iSkillPressureID] ~= nil)do
-						--	if(SkillPressure[iSkillPressureID][1] == Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1])then
-						--		iPressure = iPressure + SkillPressure[iSkillPressureID][2]
-						--	end
-						--	iSkillPressureID = iSkillPressureID + 1
-						--end
-						---------------------一阶段前的额外检测
-
-						if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "ShipIdioStateKeyTempOn")then
-							if(AllUnitsStates[iShip][iAbilityLocalNumber + 3]==0)then
-									if(AllUnitsStates[iShip][iAbilityLocalNumber + 1]==1 or AllUnitsStates[iShip][iAbilityLocalNumber + 1]==2 or AllUnitsStates[iShip][iAbilityLocalNumber + 1]==3)then
-										AllUnitsStates[iShip][iAbilityLocalNumber + 3] = Universe_GameTime() + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11]
-										xSetShipIdioStateKey(iShip,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10],"On")
-									end
-							elseif(AllUnitsStates[iShip][iAbilityLocalNumber + 3]>0)then
-									if(AllUnitsStates[iShip][iAbilityLocalNumber + 3] <= Universe_GameTime())then
-										xSetShipIdioStateKey(iShip,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10],"Off")
-										AllUnitsStates[iShip][iAbilityLocalNumber + 3] = - Universe_GameTime() - Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12]
-									end
-							elseif(-AllUnitsStates[iShip][iAbilityLocalNumber + 3] <= Universe_GameTime())then
-								AllUnitsStates[iShip][iAbilityLocalNumber + 3] = 0
+					local iAnim = 1 --播放所有动画
+					while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][7][1][iAnim] ~= nil)do
+						SobGroup_SetMadState(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][7][1][iAnim])
+						iAnim = iAnim + 1
+					end
+					local iEvent = 1 --播放所有蘙效
+					while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][7][2][iEvent] ~= nil)do
+						FX_StartEvent(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][7][2][iEvent])
+						iEvent = iEvent + 1
+					end
+								
+					--技能执行
+					if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfChangePower")then
+						local iPower = 1
+						while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][iPower] ~= nil)do
+							SobGroup_ChangePower(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][iPower], 1)
+							iPower = iPower + 1
+						end
+					elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfInvulnerability")then
+						SobGroup_SetInvulnerability(iGroup, 1)
+					elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfHardpointInvulnerability")then
+						SobGroup_SetInvulnerabilityOfHardPoint(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10], 1)
+					elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfShipAbility")then
+						if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11] ~= 0)then
+							if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10] == 0)then
+								SobGroup_MakeSelectable(iGroup,1)
+							else
+								SobGroup_AbilityActivate(iGroup, AB_Table[Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]], 1)
+							end
+						else
+							if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10] == 0)then
+								SobGroup_MakeSelectable(iGroup,0)
+							else
+								SobGroup_AbilityActivate(iGroup, AB_Table[Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]], 0)
 							end
 						end
-
-						if(AllUnitsStates[iShip][iAbilityLocalNumber + 1] == 1)then---------------------一阶段动作
-							AllUnitsStates[iShip][iAbilityLocalNumber + 1] = 2
-							local iAnim = 1 --播放所有动画
-							while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][1][iAnim] ~= nil)do
-								SobGroup_SetMadState(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][1][iAnim])
-								iAnim = iAnim + 1
+					elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfCommand")then
+						if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==1)then--移动命令
+							local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+							if(iFlag==1)then
+								SobGroup_MoveToSobGroup(iCommandGroup, iTargetGroup)
 							end
-							local iEvent = 1 --播放所有蘙效
-							while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][2][iEvent] ~= nil)do
-								FX_StartEvent(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][2][iEvent])
-								iEvent = iEvent + 1
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==2)then--攻击命令
+							local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+							if(iFlag==1)then
+								SobGroup_Attack(iPlayer, iCommandGroup, iTargetGroup)
 							end
-							AllUnitsStates[iShip][iAbilityLocalNumber + 2] = Universe_GameTime() + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][3]
-							
-							--技能执行
-							if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfChangePower")then
-								local iPower = 1
-								while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11][iPower] ~= nil)do
-									SobGroup_ChangePower(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11][iPower], 0)
-									iPower = iPower + 1
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==3)then--护航命令
+							local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+							if(iFlag==1)then
+								SobGroup_GuardSobGroup(iCommandGroup, iTargetGroup)
+							end
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==4)then--维修命令
+							local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+							if(iFlag==1)then
+								SobGroup_RepairSobGroup(iCommandGroup, iTargetGroup)
+							end
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==6)then--采集命令
+							if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
+								local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+								if(iFlag==1)then
+									SobGroup_Resource(iPlayer, iCommandGroup)
 								end
-							--elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfChangePower2")then
-							--	for iIndex,iWeapon in Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10] do
-							--		if (iIndex~=AllUnitsStates[iShip][2]) then
-							--			local iPower = 1
-							--			while(iWeapon[iPower] ~= nil)do
-							--				SobGroup_ChangePower(iGroup, iWeapon[iPower], 0)
-							--				iPower = iPower + 1
-							--			end
-							--		end
-							--	end
-							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCode")then
-								Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10](iGroup, iPlayer, iShip)
-							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "DroneShip")then
-								local iDroneMotherShipName = iGroup..iShip.."_"..iAbility.."_Drone_"
-								local iDrone = 1
-								while(iDrone <= Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11])do
-									SobGroup_Create(iDroneMotherShipName..iDrone)
-									SobGroup_SetSwitchOwnerFlag(iDroneMotherShipName..iDrone, 0)
-									iDrone = iDrone + 1
+							else
+								SobGroup_Resource(iPlayer, iGroup)
+							end
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==8)then--捕捉命令
+							local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+							if(iFlag==1)then
+								SobGroup_CaptureSobGroup(iCommandGroup, iTargetGroup)
+							end
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==9)then--停泊命令
+							local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+							if(iFlag==1)then
+								SobGroup_DockSobGroup(iCommandGroup, iTargetGroup)
+							end
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==12)then--停止命令
+							if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
+								local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+								if(iFlag==1)then
+									SobGroup_Stop(iPlayer, iCommandGroup)
 								end
-								AllUnitsStates[iShip][iAbilityLocalNumber + 4] = iDrone
-							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "RestrictShipBuildingOption")then
-								local iBuildOption = 1
-								while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][iBuildOption] ~= nil)do
-									SobGroup_RestrictBuildOption(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][iBuildOption])
-									iBuildOption = iBuildOption + 1
+							else
+								SobGroup_Stop(iPlayer, iGroup)
+							end
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==14)then--列队命令
+							local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+							if(iFlag==1)then
+								SobGroup_ParadeSobGroup(iCommandGroup, iTargetGroup, 0)
+							end
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==23)then--回收命令
+							local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+							if(iFlag==1)then
+								SobGroup_SalvageSobGroup(iCommandGroup, iTargetGroup)
+							end
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==24)then--自毁命令
+							if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
+								local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+								if(iFlag==1)then
+									SobGroup_TakeDamage(iCommandGroup, 1)
+								end
+							else
+								SobGroup_TakeDamage(iGroup, 1)
+							end
+						elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==31)then--自定义命令
+							if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
+								local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+								if(iFlag==1)then
+									SobGroup_CustomCommand(iCommandGroup)
 								end
 							end
 						end
-
-						if(AllUnitsStates[iShip][iAbilityLocalNumber + 1] == 2)then---------------------一阶段完成
-							if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][6][4] == 1)then
-								iSpeedMu = 0
-							end
-							--技能执行
-							if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfIdioFuel")then
-								iFuelCap = iFuelCap + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]
-							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfIdioShield")then
-								iShieldCap = iShieldCap + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]
-							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfIdioArmor")then
-								iArmorCap = iArmorCap + Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]
-							end
-							
-							if(Universe_GameTime() >= AllUnitsStates[iShip][iAbilityLocalNumber + 2])then
-								AllUnitsStates[iShip][iAbilityLocalNumber + 1] = 3
-								AllUnitsStates[iShip][iAbilityLocalNumber + 9] = Universe_GameTime()
-								
-								local iAnim = 1 --播放所有动画
-								while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][7][1][iAnim] ~= nil)do
-									SobGroup_SetMadState(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][7][1][iAnim])
-									iAnim = iAnim + 1
-								end
-								local iEvent = 1 --播放所有蘙效
-								while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][7][2][iEvent] ~= nil)do
-									FX_StartEvent(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][7][2][iEvent])
-									iEvent = iEvent + 1
-								end
-								
-								--技能执行
-								if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfChangePower")then
-									local iPower = 1
-									while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][iPower] ~= nil)do
-										SobGroup_ChangePower(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][iPower], 1)
-										iPower = iPower + 1
-									end
-								--elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfChangePower2")then
-								--	local iPower = 1
-								--	while(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][AllUnitsStates[iShip][2]][iPower] ~= nil)do
-								--		SobGroup_ChangePower(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10][AllUnitsStates[iShip][2]][iPower], 1)
-								--		iPower = iPower + 1
-								--	end
-								elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfInvulnerability")then
-									SobGroup_SetInvulnerability(iGroup, 1)
-								elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfHardpointInvulnerability")then
-									SobGroup_SetInvulnerabilityOfHardPoint(iGroup, Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10], 1)
-								elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfShipAbility")then
-									if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11] ~= 0)then
-										if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10] == 0)then
-											SobGroup_MakeSelectable(iGroup,1)
-										else
-											SobGroup_AbilityActivate(iGroup, AB_Table[Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]], 1)
-										end
-									else
-										if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10] == 0)then
-											SobGroup_MakeSelectable(iGroup,0)
-										else
-											SobGroup_AbilityActivate(iGroup, AB_Table[Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]], 0)
-										end
-									end
-								elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "OneselfCommand")then
-									--if (Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13]~=1 and Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14]~=0 and Player_GetLevelOfDifficulty(iPlayer)~=0) then
-									--	CPU_RemoveSobGroup(iPlayer, iGroup)
-									--end
-									if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==1)then--移动命令
-										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-										if(iFlag==1)then
-											SobGroup_MoveToSobGroup(iCommandGroup, iTargetGroup)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==2)then--攻击命令
-										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-										if(iFlag==1)then
-											SobGroup_Attack(iPlayer, iCommandGroup, iTargetGroup)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==3)then--护航命令
-										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-										if(iFlag==1)then
-											SobGroup_GuardSobGroup(iCommandGroup, iTargetGroup)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==4)then--维修命令
-										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-										if(iFlag==1)then
-											SobGroup_RepairSobGroup(iCommandGroup, iTargetGroup)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==6)then--采集命令
-										if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
-											local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-											if(iFlag==1)then
-												SobGroup_Resource(iPlayer, iCommandGroup)
-											end
-										else
-											SobGroup_Resource(iPlayer, iGroup)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==8)then--捕捉命令
-										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-										if(iFlag==1)then
-											SobGroup_CaptureSobGroup(iCommandGroup, iTargetGroup)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==9)then--停泊命令
-										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-										if(iFlag==1)then
-											SobGroup_DockSobGroup(iCommandGroup, iTargetGroup)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==12)then--停止命令
-										if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
-											local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-											if(iFlag==1)then
-												SobGroup_Stop(iPlayer, iCommandGroup)
-											end
-										else
-											SobGroup_Stop(iPlayer, iGroup)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==14)then--列队命令
-										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-										if(iFlag==1)then
-											SobGroup_ParadeSobGroup(iCommandGroup, iTargetGroup, 0)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==23)then--回收命令
-										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-										if(iFlag==1)then
-											SobGroup_SalvageSobGroup(iCommandGroup, iTargetGroup)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==24)then--自毁命令
-										if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
-											local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-											if(iFlag==1)then
-												SobGroup_TakeDamage(iCommandGroup, 1)
-											end
-										else
-											SobGroup_TakeDamage(iGroup, 1)
-										end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==31)then--自定义命令
-										if(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15]==1)then
-											local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-											if(iFlag==1)then
-												SobGroup_CustomCommand(iCommandGroup)
-											end
-										end
-									end
-									elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==32)then--神风命令
-										local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
-										if(iFlag==1)then
-											SobGroup_Kamikaze(iCommandGroup, iTargetGroup)
-										end
-									end
+					elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10]==32)then--神风命令
+						local iFlag,iCommandGroup,iTargetGroup = X_GetCommandGroup(iPlayer,iGroup,Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][13],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][14],Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][15])
+						if(iFlag==1)then
+							SobGroup_Kamikaze(iCommandGroup, iTargetGroup)
+						end
 								elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CycExplode")then
 									local iHostilityPlayer = 0
 									while(iHostilityPlayer < Stats_PlayerCount())do
