@@ -1,8 +1,10 @@
 --version 2.1.0.2017.03.26
 dofilepath("data:leveldata/multiplayer/resdata/pingstring.txt")
-dofilepath("data:leveldata/multiplayer/resdata/XConditionJudge.lua")
 dofilepath("data:leveldata/multiplayer/resdata/XFunctions.lua")
+dofilepath("data:leveldata/multiplayer/resdata/XCustomCodeFunction.lua")
 AllUnitsStates = {}
+x_RunCounter=1
+x_RunDivider=20--ÌØÖÊÔËËãÆ½Ì¯Á¿£¨·Ö20·ÝÖ´ÐÐ£©
 GlobalStateKey = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
 CheckPressureKey = 500
 RuningPressureKey = 220
@@ -43,7 +45,80 @@ AB_Table =
 	AB_Custom,
 	AB_Kamikaze,
 }
-
+--¼àÌýGameEvent¸üÐÂµ¥Î»ÁÐ±í
+function X_UpdateUnitFromGameEvent()
+	local iPort=1
+	while(GameEvent_IsListening(X_InitPort+2*iPort-1)~="")do
+		local CustomGroup=GameEvent_IsListening(X_InitPort+2*iPort-1)
+		local shipID=tonumber(GameEvent_IsListening(X_InitPort+2*iPort))
+		--if shipID>0 then--Â¼ÈëÐÂµ¥Î»
+		local playerIndex=SobGroup_OwnedBy(CustomGroup..shipID)
+		if (AllUnitsStates[shipID]==nil) then
+			InitlizeUnitStates(CustomGroup, playerIndex, shipID)
+		end
+		--end
+		GameEvent_UnListen(X_InitPort+2*iPort)
+		GameEvent_UnListen(X_InitPort+2*iPort-1)
+		iPort=iPort+1
+	end
+end
+--¼àÌýGameEvent¸üÐÂGlobalKey
+function X_UpdateGlobalKeys()
+	local iPort=1
+	while(GameEvent_IsListening(X_GlobalKeyPort+2*iPort-1)~="")do
+		local iKeyNumber=tonumber(GameEvent_IsListening(X_GlobalKeyPort+2*iPort-1))
+		local iKey=GameEvent_IsListening(X_GlobalKeyPort+2*iPort)
+		xSetGlobalStateKey(iKeyNumber,iKey)
+		GameEvent_UnListen(X_GlobalKeyPort+2*iPort)
+		GameEvent_UnListen(X_GlobalKeyPort+2*iPort-1)
+		iPort=iPort+1
+	end
+end
+--¼àÌýGameEvent¸üÐÂShipKey
+function X_UpdateShipKeys()
+	local iPort=1
+	while(GameEvent_IsListening(X_ShipKeyPort+2*iPort-1)~="")do
+		local iKeyNumber=tonumber(GameEvent_IsListening(X_ShipKeyPort+2*iPort-1))
+		local iShip=tonumber(GameEvent_IsListening(X_ShipKeyPort+2*iPort))
+		if(iKeyNumber>0)then--ÉèÖÃShipKey
+			if(iShip>0)then--On
+				xSetShipIdioStateKey(iShip,iKeyNumber,"On")
+			else--Off
+				iShip=abs(iShip)
+				xSetShipIdioStateKey(iShip,iKeyNumber,"Off")
+			end
+		else--ÇÐ»»ShipKeyµÄ×´Ì¬
+			iKeyNumber=abs(iKeyNumber)
+			if(xGetShipIdioStateKey(iShip,iKeyNumber)=="Off")then
+				xSetShipIdioStateKey(iShip,iKeyNumber,"On")
+			else
+				xSetShipIdioStateKey(iShip,iKeyNumber,"Off")
+			end
+		end
+		GameEvent_UnListen(X_ShipKeyPort+2*iPort)
+		GameEvent_UnListen(X_ShipKeyPort+2*iPort-1)
+		iPort=iPort+1
+	end
+end
+--ËùÓÐÒÑÂ¼Èëµ¥Î»µÄÌØÖÊÖ´ÐÐ
+function X_Run()
+	X_UpdateGlobalKeys()
+	X_UpdateShipKeys()
+	if(x_RunCounter>=x_RunDivider)then
+		x_RunCounter=0
+	else
+		for shipID,shipData in AllUnitsStates do
+			if (shipData[1]~=nil)and(mod(shipID,x_RunDivider)==x_RunCounter) then
+				local CustomGroup=shipData[25]..shipID
+				local playerIndex=SobGroup_OwnedBy(shipData[25]..shipID)
+				PingShowStates(CustomGroup, playerIndex, shipID)
+				UnitCharacteristicCheck(CustomGroup, playerIndex, shipID)
+				UnitCharacteristicRuning(CustomGroup, playerIndex, shipID)
+			end
+		end
+		x_RunCounter=x_RunCounter+1
+	end
+end
 
 function LevelPingLine(iLevel)
 	local sLevel = ""
@@ -388,8 +463,9 @@ function xGetStateKeyTable(iUnit)
 	return iKeyTable
 end
 
-function InitlizeUnitStates(iGroup, iPlayer, iUnit, iId)--AllUnitsStates³õÊ¼»¯£¬²ÎÊýÎª£ºµ¥Î»×éÃû£¬µ¥Î»ËùÊôÍæ¼Ò±àºÅ£¬µ¥Î»±àºÅ£¬µ¥Î»ID
+function InitlizeUnitStates(iGroup, iPlayer, iId)--AllUnitsStates³õÊ¼»¯£¬²ÎÊýÎª£ºµ¥Î»×éÃû£¬µ¥Î»ËùÊôÍæ¼Ò±àºÅ£¬µ¥Î»ID
 	AllUnitsStates[iId] = {}
+	local iUnit=GetUnitsIndex(iGroup)
 	if (Units[iUnit]==nil) then
 		_ALERT("X System Error: "..iGroup.." has called X System functions but has no data in reslist.lua")
 	else
@@ -417,7 +493,7 @@ function InitlizeUnitStates(iGroup, iPlayer, iUnit, iId)--AllUnitsStates³õÊ¼»¯£¬
 		AllUnitsStates[iId][22] = 0													--½á¹¹Ôö¼õ×´Ì¬¼ÇÂ¼
 		AllUnitsStates[iId][23] = 0													--È¼ÁÏPing
 		AllUnitsStates[iId][24] = {0,0}											--È¼ÁÏ
-		AllUnitsStates[iId][25] = 0													
+		AllUnitsStates[iId][25] = iGroup										--µ¥Î»ÀàÐÍ
 		AllUnitsStates[iId][26] = 0
 		AllUnitsStates[iId][27] = 0
 		AllUnitsStates[iId][28] = 0
@@ -443,14 +519,14 @@ function InitlizeUnitStates(iGroup, iPlayer, iUnit, iId)--AllUnitsStates³õÊ¼»¯£¬
 		if(BarDisplayOnOff ~= 0)then
 			if(iPlayer == Universe_CurrentPlayer())then
 				if(Units[AllUnitsStates[iId][1]].LifeBarType == 2)then
-					--AllUnitsStates[iId][10][1] = Ping_AddSobGroup("", "shipmark_0", iGroup)
-					--AllUnitsStates[iId][12][1] = Ping_AddSobGroup("", "shipmark_1", iGroup)
-					--AllUnitsStates[iId][12][2] = Ping_AddSobGroup("", "shipmark_2", iGroup)
-					AllUnitsStates[iId][9] = Ping_AddSobGroup("", "shipmark_1_over", iGroup)
+					--AllUnitsStates[iId][10][1] = Ping_AddSobGroup("", "shipmark_0", iGroup..iId)
+					--AllUnitsStates[iId][12][1] = Ping_AddSobGroup("", "shipmark_1", iGroup..iId)
+					--AllUnitsStates[iId][12][2] = Ping_AddSobGroup("", "shipmark_2", iGroup..iId)
+					AllUnitsStates[iId][9] = Ping_AddSobGroup("", "shipmark_1_over", iGroup..iId)
 				elseif(Units[AllUnitsStates[iId][1]].LifeBarType == 1)then
-					--AllUnitsStates[iId][10][1] = Ping_AddSobGroup("", "shipmark_0_small", iGroup)
-					--AllUnitsStates[iId][12][1] = Ping_AddSobGroup("", "shipmark_1_small", iGroup)
-					AllUnitsStates[iId][9] = Ping_AddSobGroup("", "shipmark_1_oversmall", iGroup)
+					--AllUnitsStates[iId][10][1] = Ping_AddSobGroup("", "shipmark_0_small", iGroup..iId)
+					--AllUnitsStates[iId][12][1] = Ping_AddSobGroup("", "shipmark_1_small", iGroup..iId)
+					AllUnitsStates[iId][9] = Ping_AddSobGroup("", "shipmark_1_oversmall", iGroup..iId)
 				end
 			end
 		end
@@ -890,7 +966,7 @@ function UnitCharacteristicCheck(iGroup, iPlayer, iShip)--¼ì²âµ¥Î»ÌØÖÊ´¥·¢Ìõ¼þ£¬
 		--	iPressure = CheckPressureKey
 		--else--change
 			if(SobGroup_Empty(iGroup) == 1)then
-				AllUnitsStates[iShip][4] = Universe_GameTime()
+				AllUnitsStates[iShip]=nil--[4] = Universe_GameTime()
 			else
 				if(AllUnitsStates[iShip][16] ~= 0)then
 					local iAbility = 1
@@ -1008,11 +1084,8 @@ function SetShipConditionSG(iShip, iGroup, iAbility, BeginState, iAbilityLocalNu
 	end
 end
 
-function UnitDeath(iShip, iGroup)
-	AllUnitsStates[iShip][4] = Universe_GameTime()
-end
-
 function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--¼ì²âµ¥Î»ÌØÖÊ´¥·¢Ìõ¼þ£¬²ÎÊýÎª£ºµ¥Î»×é¼°Ãû³Æ£¬Íæ¼ÒID£¬µ¥Î»ID
+if(AllUnitsStates[iShip]~=nil)then
 	local iPlayerRUGet = {0,0,0,0,0,0,0,0,}
 	if(AllUnitsStates[iShip][16] ~= 0)then
 		local iHealth = SobGroup_HealthPercentage(iGroup)
@@ -1116,7 +1189,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--¼ì²âµ¥Î»ÌØÖÊ´¥·¢Ìõ¼þ£
 				elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCode")then
 					Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][10](iGroup, iPlayer, iShip)
 				elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "DroneShip")then
-					local iDroneMotherShipName = iGroup..iShip.."_"..iAbility.."_Drone_"
+					local iDroneMotherShipName = iGroup.."_"..iAbility.."_Drone_"
 					local iDrone = 1
 					while(iDrone <= Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11])do
 						SobGroup_Create(iDroneMotherShipName..iDrone)
@@ -1383,7 +1456,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--¼ì²âµ¥Î»ÌØÖÊ´¥·¢Ìõ¼þ£
 							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCode")then
 								Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11](iGroup, iPlayer, iShip)
 							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "DroneShip")then
-								local iDroneMotherShipName = iGroup..iShip.."_"..iAbility.."_Drone_"
+								local iDroneMotherShipName = iGroup.."_"..iAbility.."_Drone_"
 								if(iHealthHold <= 0)then
 									AllUnitsStates[iShip][iAbilityLocalNumber + 1] = 4
 								else
@@ -1686,7 +1759,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--¼ì²âµ¥Î»ÌØÖÊ´¥·¢Ìõ¼þ£
 									if(SobGroup_IsDoingAbility(iGroup, AB_Hyperspace) == 0 and SobGroup_IsDocked(iGroup) == 0)then--Ã»ÓÐÊ¹ÓÃ³¬¿Õ¼ä»òÍ£²´ÄÜÁ¦
 										local iGoAttacking = 0
 										local iShipTactics = SobGroup_GetROE(iGroup)
-										local iDroneMotherShipName = iGroup..iShip.."_"..iAbility.."_Drone_"
+										local iDroneMotherShipName = iGroup.."_"..iAbility.."_Drone_"
 										if(iShipTactics == 0 and Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][16][3] ~= 0)then--ÎÞÈË»úÊÇ·ñ³ö»÷
 											iGoAttacking = 1
 										elseif(iShipTactics == 1 and Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][16][2] ~= 0)then
@@ -1861,7 +1934,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--¼ì²âµ¥Î»ÌØÖÊ´¥·¢Ìõ¼þ£
 							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "CustomCode")then
 								Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][12](iGroup, iPlayer, iShip)
 							elseif(Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][1] == "DroneShip")then
-								local iDroneMotherShipName = iGroup..iShip.."_"..iAbility.."_Drone_"
+								local iDroneMotherShipName = iGroup.."_"..iAbility.."_Drone_"
 								if(AllUnitsStates[iShip][iAbilityLocalNumber + 4] > 0)then
 									local iDrone = 1
 									while(iDrone <= Units[AllUnitsStates[iShip][1]].Ability.Characteristic[iAbility][11])do
@@ -2160,6 +2233,7 @@ function UnitCharacteristicRuning(iGroup, iPlayer, iShip)--¼ì²âµ¥Î»ÌØÖÊ´¥·¢Ìõ¼þ£
 		end
 		iPlayerIdex = iPlayerIdex + 1
 	end
+end
 end
 
 function DetectLevel(iExperience)

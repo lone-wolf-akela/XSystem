@@ -1,11 +1,12 @@
 --version 2.1.2.2017.05.07
 
---dofilepath("data:leveldata/multiplayer/resdata/reslist.lua")
-dofilepath("data:leveldata/multiplayer/resdata/XTechConditionJudge.lua")
+dofilepath("data:leveldata/multiplayer/resdata/XCode.lua")
 dofilepath("data:leveldata/multiplayer/resdata/XTechFunction.lua")
 TechnologyControlState = {}
 TechnologyTimeCountDown = {}
 TechnologyControlStateAnnal = {}
+SHIPGLOBALSTATEOBLIGATENUMBER = 30
+UNITUPDATETIME = 0.5 --单位列表更新时间间隔
 
 SG_Characteristic = 
 {
@@ -78,8 +79,6 @@ function Entrance()
 	--UI_SetElementEnabled("NewResearchMenu","btnShowAll",0)
 end
 
-SHIPGLOBALSTATEOBLIGATENUMBER = 30
-
 function UnitCharacteristicInitlize()
 	SobGroup_Create("X_CommandTempGroup")
 	SobGroup_SetSwitchOwnerFlag("X_CommandTempGroup", 0)
@@ -107,6 +106,8 @@ function UnitCharacteristicInitlize()
 	SobGroup_Create("UnitControlTempGroup2")
 	SobGroup_SetSwitchOwnerFlag("UnitControlTempGroup2", 0)
 	
+	Rule_AddInterval("X_UpdateUnitFromGameEvent",UNITUPDATETIME)
+	Rule_Add("X_Run")
 	--Rule_Add("UnitCharacteristicCheck")
 	--Rule_Add("UnitCharacteristicRuning")
 	--Rule_AddInterval("UnitCharacteristicRuning",UNITCHARACTERISTICTEMPTIME)

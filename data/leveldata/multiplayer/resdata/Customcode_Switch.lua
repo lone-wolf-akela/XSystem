@@ -1,9 +1,5 @@
 function Start_X_Switch(CustomGroup, playerIndex, shipID) 
-	if(xGetShipIdioStateKey(shipID,1)=="Off")then
-		xSetShipIdioStateKey(shipID,1,"On")
-	else
-		xSetShipIdioStateKey(shipID,1,"Off")
-	end
+	xSwitchShipIdioStateKeyFromCustomCode(shipID,1)
 end
 
 function Do_X_Switch(CustomGroup, playerIndex, shipID)  	
